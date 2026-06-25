@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spin &amp; Confess</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&family=Caveat:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="noise"></div>
+      <div class="grid-bg"></div>
+
+      <section class="screen screen-home active" data-screen="home">
+        <div class="logo-wrap">
+          <div class="logo-badge">
+            <span class="logo-star">★</span>
+            <span class="logo-star logo-star-2">✦</span>
+          </div>
+          <h1 class="logo">
+            Spin<br /><span class="logo-accent">&amp;</span><br />Confess
+          </h1>
+          <p class="tagline">A truth-or-dare roulette for brave friends.</p>
+        </div>
+
+        <div class="card card-home">
+          <label class="field">
+            <span class="field-label">Your nickname</span>
+            <input
+              type="text"
+              id="player-name"
+              maxlength="14"
+              placeholder="e.g. Captain Chaos"
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="divider">
+            <span>or</span>
+          </div>
+
+          <div class="row-2">
+            <button class="btn btn-primary" id="btn-create">
+              <span>Create Room</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button class="btn btn-ghost" id="btn-show-join">
+              <span>Join Room</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+
+          <div class="join-panel hidden" id="join-panel">
+            <label class="field">
+              <span class="field-label">Room code</span>
+              <input
+                type="text"
+                id="room-code-input"
+                maxlength="6"
+                placeholder="ABC123"
+                autocomplete="off"
+              />
+            </label>
+            <button class="btn btn-primary" id="btn-join">
+              <span>Enter Room</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="footer-note">No sign-up. No ads. Just chaos.</div>
+      </section>
+
+      <section class="screen screen-lobby" data-screen="lobby">
+        <header class="topbar">
+          <div class="topbar-left">
+            <div class="logo-mini">S&amp;C</div>
+            <div class="room-code-display">
+              <span class="room-code-label">ROOM</span>
+              <span class="room-code-value" id="room-code-display">------</span>
+              <button class="copy-btn" id="btn-copy-code" title="Copy link">
+                ⎘
+              </button>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-ghost btn-sm" id="btn-leave-lobby">
+              Leave
+            </button>
+          </div>
+        </header>
+
+        <div class="lobby-body">
+          <div class="lobby-left">
+            <h2 class="lobby-title">The Crew</h2>
+            <div class="player-grid" id="player-grid"></div>
+            <div class="lobby-hint">
+              <span class="hint-dot"></span>
+              Share the room code with friends. Minimum 2 players to start.
+            </div>
+          </div>
+
+          <div class="lobby-right">
+            <div class="rules-card">
+              <h3 class="rules-title">How it works</h3>
+              <ol class="rules-list">
+                <li>The wheel spins and picks a victim.</li>
+                <li>They choose Truth or Dare.</li>
+                <li>Everyone else submits a challenge.</li>
+                <li>The crew votes. The winner plays.</li>
+              </ol>
+            </div>
+            <button
+              class="btn btn-primary btn-lg btn-start"
+              id="btn-start-game"
+              disabled
+            >
+              <span>Start the Game</span>
+              <span class="btn-arrow">▶</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen screen-game" data-screen="game">
+        <header class="topbar">
+          <div class="topbar-left">
+            <div class="logo-mini">S&amp;C</div>
+            <div class="round-indicator">
+              <span class="round-label">ROUND</span>
+              <span class="round-value" id="round-value">1</span>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-ghost btn-sm" id="btn-leave-game">
+              Quit
+            </button>
+          </div>
+        </header>
+
+        <div class="game-stage" id="game-stage">
+          <div class="phase-intro" data-phase="intro">
+            <div class="phase-title">Get ready...</div>
+            <div class="phase-sub">The wheel is about to choose your fate.</div>
+          </div>
+
+          <div class="phase-spin" data-phase="spin">
+            <div class="wheel-wrap">
+              <div class="wheel-pin"></div>
+              <div class="wheel" id="wheel"></div>
+            </div>
+            <div class="phase-sub spin-sub">Spinning...</div>
+          </div>
+
+          <div class="phase-choice" data-phase="choice">
+            <div class="chosen-player-card">
+              <div class="chosen-label">The wheel has spoken</div>
+              <div class="chosen-name" id="chosen-name">???</div>
+              <div class="chosen-prompt">Truth or Dare?</div>
+              <div class="choice-buttons">
+                <button class="btn btn-truth" data-choice="truth">
+                  <span class="choice-letter">T</span>
+                  <span class="choice-word">Truth</span>
+                </button>
+                <button class="btn btn-dare" data-choice="dare">
+                  <span class="choice-letter">D</span>
+                  <span class="choice-word">Dare</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="phase-submit" data-phase="submit">
+            <div class="submit-header">
+              <div class="submit-title">
+                Drop your best <span id="submit-type">challenge</span>
+              </div>
+              <div class="submit-sub">
+                For <span id="submit-target">???</span>. Make it count.
+              </div>
+            </div>
+            <div class="submit-form">
+              <textarea
+                id="challenge-input"
+                maxlength="140"
+                placeholder="Type your challenge..."
+              ></textarea>
+              <div class="submit-actions">
+                <div class="char-count"><span id="char-count">0</span>/140</div>
+                <button class="btn btn-primary" id="btn-submit-challenge">
+                  <span>Lock it in</span>
+                  <span class="btn-arrow">→</span>
+                </button>
+              </div>
+            </div>
+            <div class="submitted-list" id="submitted-list"></div>
+          </div>
+
+          <div class="phase-vote" data-phase="vote">
+            <div class="vote-header">
+              <div class="vote-title">Cast your vote</div>
+              <div class="vote-sub">
+                Pick the challenge <span id="vote-target">???</span> must face.
+              </div>
+            </div>
+            <div class="vote-list" id="vote-list"></div>
+            <div class="vote-timer">
+              <div class="timer-bar" id="timer-bar"></div>
+              <div class="timer-text"><span id="timer-text">15</span>s</div>
+            </div>
+          </div>
+
+          <div class="phase-reveal" data-phase="reveal">
+            <div class="reveal-card">
+              <div class="reveal-label">The chosen challenge</div>
+              <div class="reveal-content" id="reveal-content">...</div>
+              <div class="reveal-author">
+                by <span id="reveal-author">???</span>
+              </div>
+              <div class="reveal-target">
+                For <span id="reveal-target">???</span>
+              </div>
+            </div>
+            <div class="reveal-actions">
+              <button class="btn btn-primary btn-lg" id="btn-done-challenge">
+                <span>I did it</span>
+                <span class="btn-arrow">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="toast-container" id="toast-container"></div>
+
+      <div class="modal hidden" id="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card">
+          <div class="modal-title" id="modal-title">Title</div>
+          <div class="modal-body" id="modal-body">Body</div>
+          <div class="modal-actions" id="modal-actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
