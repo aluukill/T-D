@@ -205,7 +205,6 @@ function subscribeRoom() {
     .on("broadcast", { event: "game:choice" }, handleGameChoice)
     .on("broadcast", { event: "challenge:submit" }, handleChallengeSubmit)
     .on("broadcast", { event: "vote:cast" }, handleVoteCast)
-    .on("broadcast", { event: "round:end" }, handleRoundEnd)
     .subscribe();
 }
 
