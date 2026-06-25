@@ -683,11 +683,51 @@ textarea {
   font-size: 16px;
 }
 
+.spin-sub {
+  min-height: 28px;
+  transition: all 0.3s ease;
+}
+
+.spin-sub.final {
+  color: var(--yellow);
+  font-family: "Archivo Black", sans-serif;
+  font-size: 22px;
+  animation: wobble 0.5s ease;
+}
+
 .wheel-wrap {
   position: relative;
   width: min(420px, 90vw);
   height: min(420px, 90vw);
   margin: 0 auto 24px;
+}
+
+.wheel-wrap.shake {
+  animation: wheelShake 0.4s ease;
+}
+
+@keyframes wheelShake {
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-4px) rotate(-0.8deg);
+  }
+  30% {
+    transform: translateX(4px) rotate(0.8deg);
+  }
+  45% {
+    transform: translateX(-3px) rotate(-0.4deg);
+  }
+  60% {
+    transform: translateX(3px) rotate(0.4deg);
+  }
+  80% {
+    transform: translateX(-1px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .wheel-pin {
@@ -702,6 +742,30 @@ textarea {
   border-top: 32px solid var(--pink);
   z-index: 5;
   filter: drop-shadow(0 3px 0 #000);
+  transition: top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wheel-pin.drop {
+  top: -4px;
+  filter: drop-shadow(0 1px 0 #000) drop-shadow(0 0 6px var(--pink));
+}
+
+.wheel-pin.hit {
+  top: -4px;
+  filter: drop-shadow(0 1px 0 #000) drop-shadow(0 0 12px var(--yellow));
+}
+
+.wheel-pin::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: var(--pink);
+  border-radius: 50%;
+  border: 2px solid #000;
 }
 
 .wheel {
@@ -718,6 +782,27 @@ textarea {
   background: #000;
 }
 
+.wheel.breathe {
+  animation: breathe 0.5s ease-in-out 4;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 4px var(--yellow),
+      var(--shadow);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow:
+      0 0 0 8px var(--yellow),
+      0 0 30px rgba(255, 210, 63, 0.3),
+      var(--shadow);
+  }
+}
+
 .wheel-segment {
   position: absolute;
   top: 0;
@@ -726,6 +811,12 @@ textarea {
   height: 100%;
   clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%);
   transform-origin: 50% 50%;
+  transition: filter 0.3s ease;
+}
+
+.wheel-segment.hit {
+  filter: brightness(1.4) drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+  z-index: 2;
 }
 
 .wheel-label {

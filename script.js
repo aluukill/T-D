@@ -349,12 +349,12 @@ function runIntro() {
         spins * 360 + targetAngle + (Math.random() * 10 - 5);
       state.game._spinTarget = finalRotation;
 
-      saveGameState();
       broadcast("game:phase", {
         phase: "spin",
         chosenId: chosen.id,
         finalRotation,
       });
+      saveGameState();
     }
   }, 1800);
 }
@@ -404,15 +404,52 @@ function runSpin() {
   buildWheel();
   const finalRotation = state.game._spinTarget;
   delete state.game._spinTarget;
-  requestAnimationFrame(() => {
-    $("#wheel").style.transform = `rotate(${finalRotation}deg)`;
-  });
+  const wheel = $("#wheel");
+  const pin = $(".wheel-pin");
+  const sub = $(".spin-sub");
+
+  pin.classList.remove("drop", "hit");
+  sub.className = "phase-sub spin-sub";
+  $(".wheel-wrap").classList.remove("shake");
+
+  sub.textContent = "Picking a chamber...";
+  wheel.classList.add("breathe");
+
   setTimeout(() => {
-    if (state.isHost) {
-      broadcast("game:phase", { phase: "choice" });
-      applyPhase("choice");
-    }
+    wheel.classList.remove("breathe");
+    sub.textContent = "Spinning...";
+    requestAnimationFrame(() => {
+      wheel.style.transform = `rotate(${finalRotation}deg)`;
+    });
+  }, 2200);
+
+  setTimeout(() => {
+    sub.textContent = "Slowing down...";
   }, 4700);
+
+  setTimeout(() => {
+    const chosenIdx = state.players.findIndex(
+      (p) => p.id === state.game.chosenId,
+    );
+    const segments = $$(".wheel-segment");
+    if (segments[chosenIdx]) segments[chosenIdx].classList.add("hit");
+
+    pin.classList.remove("drop");
+    void pin.offsetWidth;
+    pin.classList.add("drop");
+
+    $(".wheel-wrap").classList.add("shake");
+
+    sub.textContent = `Landed on ${state.players.find((p) => p.id === state.game.chosenId)?.name || "???"} !`;
+    sub.className = "phase-sub spin-sub final";
+
+    setTimeout(() => {
+      if (state.isHost) {
+        broadcast("game:phase", { phase: "choice" });
+        applyPhase("choice");
+      }
+    }, 2000);
+  }, 6900);
 }
 
 function renderChoice() {
