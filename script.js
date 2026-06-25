@@ -339,14 +339,30 @@ function runIntro() {
       state.game.chosenId = chosen.id;
       state.game.challenges = [];
       state.game.votes = {};
+
+      const n = state.players.length;
+      const seg = 360 / n;
+      const chosenIdx = state.players.findIndex((p) => p.id === chosen.id);
+      const targetAngle = 360 - (chosenIdx * seg + seg / 2);
+      const spins = 5 + Math.floor(Math.random() * 3);
+      const finalRotation =
+        spins * 360 + targetAngle + (Math.random() * 10 - 5);
+      state.game._spinTarget = finalRotation;
+
       saveGameState();
-      broadcast("game:phase", { phase: "spin", chosenId: chosen.id });
+      broadcast("game:phase", {
+        phase: "spin",
+        chosenId: chosen.id,
+        finalRotation,
+      });
     }
   }, 1800);
 }
 
 function handleGamePhase({ payload }) {
   if (payload.chosenId) state.game.chosenId = payload.chosenId;
+  if (payload.finalRotation !== undefined)
+    state.game._spinTarget = payload.finalRotation;
   applyPhase(payload.phase);
 }
 
@@ -355,6 +371,8 @@ function buildWheel() {
   wheel.innerHTML = "";
   const n = state.players.length;
   const seg = 360 / n;
+  const wheelSize = wheel.offsetWidth || 420;
+  const labelOffset = wheelSize * 0.33;
   state.players.forEach((p, i) => {
     const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
     const startAngle = i * seg;
@@ -367,8 +385,11 @@ function buildWheel() {
     const label = document.createElement("div");
     label.className = "wheel-label";
     label.textContent = p.name;
-    label.style.transform = `rotate(${labelAngle}deg) translateY(-20px)`;
-    label.style.transformOrigin = "50% 250%";
+    if (labelAngle > 90 && labelAngle < 270) {
+      label.style.transform = `rotate(${labelAngle + 180}deg) translateY(-${labelOffset}px)`;
+    } else {
+      label.style.transform = `rotate(${labelAngle}deg) translateY(-${labelOffset}px)`;
+    }
     segment.appendChild(label);
     wheel.appendChild(segment);
   });
@@ -381,14 +402,8 @@ function buildWheel() {
 
 function runSpin() {
   buildWheel();
-  const n = state.players.length;
-  const seg = 360 / n;
-  const chosenIdx = state.players.findIndex(
-    (p) => p.id === state.game.chosenId,
-  );
-  const targetAngle = 360 - (chosenIdx * seg + seg / 2);
-  const spins = 5 + Math.floor(Math.random() * 3);
-  const finalRotation = spins * 360 + targetAngle + (Math.random() * 10 - 5);
+  const finalRotation = state.game._spinTarget;
+  delete state.game._spinTarget;
   requestAnimationFrame(() => {
     $("#wheel").style.transform = `rotate(${finalRotation}deg)`;
   });
