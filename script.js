@@ -440,6 +440,17 @@ function handleGameChoice({ payload }) {
   }
 }
 
+function handleChallengeSubmit({ payload }) {
+  if (!payload || !payload.challenge || !state.game) return;
+  const challenge = payload.challenge;
+  if (state.game.challenges.some((c) => c.id === challenge.id)) return;
+  state.game.challenges.push(challenge);
+  if (challenge.authorId !== state.playerId) {
+    toast(`${challenge.authorName} submitted`, "success");
+  }
+  renderSubmittedList();
+}
+
 function renderSubmit() {
   const chosen = state.players.find((p) => p.id === state.game.chosenId);
   const isChosen = state.playerId === state.game.chosenId;
